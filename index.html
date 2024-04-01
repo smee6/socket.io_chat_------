@@ -1,0 +1,78 @@
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Socket.IO Chat Example</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+</head>
+
+<body>
+  <div id="status"></div>
+  <br>
+  <input type="text" id="nickname" placeholder="Enter your nickname">
+  : 닉네임을 입력해야 메시지 보낼 수 있음 (적고 엔터)
+  <ul id="messages"></ul>
+  <input type="text" id="chatMessage" placeholder="Type a message">
+  <button id="send">Send</button>
+
+  <script>
+    const statusElement = document.getElementById('status');
+    const messagesElement = document.getElementById('messages');
+    const serverUrl = 'http://localhost:4000';
+    const socket = io(serverUrl);
+
+    document.getElementById('send').addEventListener('click', () => {
+      const messageInput = document.getElementById('chatMessage');
+      const message = messageInput.value;
+      socket.emit('chatMessage', message); // 메시지 전송
+      messageInput.value = ''; // 입력 필드 초기화
+    });
+
+    //엔터눌러도 send
+    document.getElementById('chatMessage').addEventListener('keypress', (event) => {
+      if (event.key === 'Enter') {
+        document.getElementById('send').click();
+      }
+    });
+
+    // 닉네임 설정
+    const nicknameInput = document.getElementById('nickname');
+    nicknameInput.addEventListener('change', () => {
+      const nickname = nicknameInput.value;
+      socket.emit('setNickname', nickname);
+    });
+
+    //닉네임 입력 안하면 send 못누름
+    document.getElementById('send').disabled = true;
+
+    // 닉네임은 한번 입력하면 끝
+    nicknameInput.addEventListener('keypress', (event) => {
+      if (event.key === 'Enter') {
+        nicknameInput.disabled = true;
+        document.getElementById('send').disabled = nicknameInput.value === '';
+      }
+    });
+
+    socket.on('connect', () => {
+      statusElement.textContent = 'Socket.IO 연결 성공';
+    });
+
+    socket.on('message', (message) => {
+      const li = document.createElement('li');
+      li.textContent = message;
+      messagesElement.appendChild(li);
+    });
+
+    socket.on('disconnect', () => {
+      statusElement.textContent = 'Socket.IO 끊김';
+    });
+
+    socket.on('error', (error) => {
+      console.error('Socket.IO 오류:', error);
+      statusElement.textContent = 'Socket.IO 오류';
+    });
+  </script>
+</body>
+
+</html>
