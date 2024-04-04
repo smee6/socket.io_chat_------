@@ -6,6 +6,47 @@
   <title>Socket.IO Chat Example</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
 </head>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+  }
+
+  #status {
+    background-color: #f8f9fa;
+    padding: 5px;
+    text-align: center;
+  }
+
+  #messages {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow-y: scroll;
+    height: 500px;
+  }
+
+  #messages li {
+    padding: 3px 5px;
+  }
+
+  #messages li:nth-child(odd) {
+    background-color: #f8f9fa;
+  }
+
+  #chatMessage {
+    width: 80%;
+    padding: 10px;
+    box-sizing: border-box;
+  }
+
+  #send {
+    width: 80%;
+    padding: 10px;
+    box-sizing: border-box;
+  }
+</style>
 
 <body>
   <div id="status"></div>
@@ -36,6 +77,9 @@
       }
     });
 
+    // 메세지의 스크롤바는 항상 아래에 위치
+
+
     // 닉네임 설정
     const nicknameInput = document.getElementById('nickname');
     nicknameInput.addEventListener('change', () => {
@@ -62,6 +106,7 @@
       const li = document.createElement('li');
       li.textContent = message;
       messagesElement.appendChild(li);
+      messagesElement.scrollTop = messagesElement.scrollHeight;
     });
 
     socket.on('disconnect', () => {
